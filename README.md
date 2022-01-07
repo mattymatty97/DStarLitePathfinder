@@ -10,25 +10,34 @@ Import the DStarLite, Pair and State files into your project.
 
 Example usage: 
 
-      //Create pathfinder
-      DStarLite pf = new DStarLite();
-      //set start and goal nodes
-      pf.init(0,1,3,1);
-      //set impassable nodes
-      pf.updateCell(2, 1, -1);
-      pf.updateCell(2, 0, -1);
-      pf.updateCell(2, 2, -1);
-      pf.updateCell(3, 0, -1);
+    //Create pathfinder
+      
+    CostProvider costProvider = new CellCostProvider(1);
+    DStarLite pf = new DStarLite(State3D.class, costProvider);
+    State start = new State3D(0,0,1);
+    State goal = new State3D(3,0,1);
+    pf.init(start,goal);
+    pf.updateCell(new State3D(2,0,1), -1);
+    pf.updateCell(new State3D(2, 0,0), -1);
+    pf.updateCell(new State3D(2, 0,2), -1);
+    pf.updateCell(new State3D(3, 0,0), -1);
 
-      //perform the pathfinding
-      pf.replan();
+    System.out.println("Start node: (0,0,1)");
+    System.out.println("End node: (3,0,1)");
 
-      //get and print the path
-      List<State> path = pf.getPath();
-      for (State i : path)
-      {   
-         System.out.println("x: " + i.x + " y: " + i.y);
-      }   
+    //Time the replanning
+    long begin = System.currentTimeMillis();
+    pf.replan();
+    long end = System.currentTimeMillis();
+
+    System.out.println("Time: " + (end-begin) + "ms");
+
+    List<State> path = pf.getPath();
+    for (State i : path)
+    {
+        State3D p = (State3D)i;
+        System.out.println("x: " + p.x + " y: " + p.y + " z: " + p.z);
+    }
       
 License
 =============
