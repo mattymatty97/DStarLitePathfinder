@@ -31,6 +31,7 @@ public class DStarLite implements java.io.Serializable{
 	public DStarLite(Class stateClass, CostProvider costProvider)
 	{
 		this.costProvider = costProvider;
+		this.costProvider.addPathfinder(this);
 		this.stateClass = stateClass;
 		maxSteps	= 80000;
 		C1			= 1;
@@ -387,14 +388,13 @@ public class DStarLite implements java.io.Serializable{
 	/*
 	 * updateCell as per [S. Koenig, 2002]
 	 */
-	public void updateCell(State u, double val)
+	public void updateCell(State u)
 	{
 		if (!(u.getClass().isAssignableFrom(this.stateClass)))
 			throw new AssertionError("You cannot use this State class with this Pathfinder Instance");
 		if ((u.eq(s_start)) || (u.eq(s_goal))) return;
 
 		makeNewCell(u);
-		costProvider.setCost(u, val);
 		updateVertex(u);
 	}
 
@@ -464,14 +464,16 @@ public class DStarLite implements java.io.Serializable{
 /*
 	public static void main(String[] args)
 	{
-		DStarLite pf = new DStarLite(State2D.class);
+
+		CellCostProvider costProvider = new CellCostProvider(1);
+		DStarLite pf = new DStarLite(State2D.class, costProvider);
 		State start = new State2D(0,1);
 		State goal = new State2D(3,1);
 		pf.init(start,goal);
-		pf.updateCell(new State2D(2,1), -1);
-		pf.updateCell(new State2D(2, 0), -1);
-		pf.updateCell(new State2D(2, 2), -1);
-		pf.updateCell(new State2D(3, 0), -1);
+		costProvider.setCost(new State2D(2,1), -1);
+		costProvider.setCost(new State2D(2, 0), -1);
+		costProvider.setCost(new State2D(2, 2), -1);
+		costProvider.setCost(new State2D(3, 0), -1);
 
 		System.out.println("Start node: (0,1)");
 		System.out.println("End node: (3,1)");
@@ -495,15 +497,15 @@ public class DStarLite implements java.io.Serializable{
 
 	public static void main(String[] args)
 	{
-		CostProvider costProvider = new CellCostProvider(1);
+		CellCostProvider costProvider = new CellCostProvider(1);
 		DStarLite pf = new DStarLite(State3D.class, costProvider);
 		State start = new State3D(0,0,1);
 		State goal = new State3D(3,0,1);
 		pf.init(start,goal);
-		pf.updateCell(new State3D(2,0,1), -1);
-		pf.updateCell(new State3D(2, 0,0), -1);
-		pf.updateCell(new State3D(2, 0,2), -1);
-		pf.updateCell(new State3D(3, 0,0), -1);
+		costProvider.setCost(new State3D(2,0,1), -1);
+		costProvider.setCost(new State3D(2, 0,0), -1);
+		costProvider.setCost(new State3D(2, 0,2), -1);
+		costProvider.setCost(new State3D(3, 0,0), -1);
 
 		System.out.println("Start node: (0,0,1)");
 		System.out.println("End node: (3,0,1)");

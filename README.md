@@ -17,10 +17,10 @@ Example usage:
     State start = new State3D(0,0,1);
     State goal = new State3D(3,0,1);
     pf.init(start,goal);
-    pf.updateCell(new State3D(2,0,1), -1);
-    pf.updateCell(new State3D(2, 0,0), -1);
-    pf.updateCell(new State3D(2, 0,2), -1);
-    pf.updateCell(new State3D(3, 0,0), -1);
+    costProvider.setCost(new State3D(2,0,1), -1);
+    costProvider.setCost(new State3D(2, 0,0), -1);
+    costProvider.setCost(new State3D(2, 0,2), -1);
+    costProvider.setCost(new State3D(3, 0,0), -1);
 
     System.out.println("Start node: (0,0,1)");
     System.out.println("End node: (3,0,1)");

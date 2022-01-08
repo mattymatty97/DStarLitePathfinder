@@ -36,8 +36,8 @@ public class CellCostProvider extends CostProvider{
         return costHash.get(u) < 0.0;
     }
 
-    @Override
     public void setCost(State u, double cost) {
         costHash.put(u,cost);
+        this.pathfinders.forEach(p->p.updateCell(u));
     }
 }
