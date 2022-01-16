@@ -20,9 +20,6 @@ public class DStarLite implements java.io.Serializable{
 	public HashMap<State, CellInfo>	cellHash = new HashMap<State, CellInfo>();
 	private final HashMap<State, Float>		openHash = new HashMap<State, Float>();
 
-	//Constants
-	private final double M_SQRT2 = Math.sqrt(2.0);
-
 	private final Class stateClass;
 
 	private final CostProvider costProvider;
@@ -47,7 +44,7 @@ public class DStarLite implements java.io.Serializable{
 	 * Initialise Method
 	 * @params start and goal coordinates
 	 */
-	public void init(State s, State g)
+	public synchronized void init(State s, State g)
 	{
 		if (!(s.getClass().isAssignableFrom(this.stateClass)))
 			throw new AssertionError("You cannot use this State class with this Pathfinder Instance");
@@ -125,7 +122,7 @@ public class DStarLite implements java.io.Serializable{
 		return a.approxDistanceFrom(b)*C1;
 	}
 
-	public boolean replan()
+	public synchronized boolean replan()
 	{
 		path.clear();
 
@@ -251,7 +248,7 @@ public class DStarLite implements java.io.Serializable{
 	 * Update the position of the agent/robot.
 	 * This does not force a replan.
 	 */
-	public void updateStart(State new_start)
+	public synchronized void updateStart(State new_start)
 	{
 		if (!(new_start.getClass().isAssignableFrom(this.stateClass)))
 			throw new AssertionError("You cannot use this State class with this Pathfinder Instance");
@@ -352,8 +349,7 @@ public class DStarLite implements java.io.Serializable{
 	private boolean isValid(State u)
 	{
 		if (openHash.get(u) == null) return false;
-		if (!close(keyHashCode(u),openHash.get(u))) return false;
-		return true;
+		return close(keyHashCode(u), openHash.get(u));
 	}
 
 	/*
@@ -388,13 +384,27 @@ public class DStarLite implements java.io.Serializable{
 	/*
 	 * updateCell as per [S. Koenig, 2002]
 	 */
-	public void updateCell(State u)
+	public synchronized void updateCell(State u)
 	{
 		if (!(u.getClass().isAssignableFrom(this.stateClass)))
 			throw new AssertionError("You cannot use this State class with this Pathfinder Instance");
 		if ((u.eq(s_start)) || (u.eq(s_goal))) return;
 
 		makeNewCell(u);
+		updateVertex(u);
+	}
+
+	/*
+	 * addition for shared cost providers to not update a pathfinder if it does not use the cell
+	 */
+	public synchronized void updateCellIfPresent(State u)
+	{
+		if (!(u.getClass().isAssignableFrom(this.stateClass)))
+			throw new AssertionError("You cannot use this State class with this Pathfinder Instance");
+		if ((u.eq(s_start)) || (u.eq(s_goal))) return;
+
+		if (cellHash.get(u) == null) return;
+
 		updateVertex(u);
 	}
 
